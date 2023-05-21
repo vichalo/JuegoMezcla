@@ -74,6 +74,7 @@ project(":core") {
 
     dependencies {
         api "com.badlogicgames.gdx:gdx:$gdxVersion"
+        implementation "com.badlogicgames.gdx:gdx-tools:$gdxVersion"
         
     }
 }
