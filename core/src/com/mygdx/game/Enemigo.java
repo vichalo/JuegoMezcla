@@ -16,7 +16,7 @@ public class Enemigo {
         posicion = new Vector2(x, y);
         velocidad = new Vector2(velocidadX, velocidadY);
         this.sprite = sprite;
-        this.boundingBox = new Rectangle(x, y, 50, 50); // Ajusta la anchura y altura de la bala
+        this.boundingBox = new Rectangle(posicion.x, posicion.y, 40, 50); // Ajusta la anchura y altura de la bala
 
     }
 

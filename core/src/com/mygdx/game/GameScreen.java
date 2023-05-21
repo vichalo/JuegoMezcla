@@ -5,6 +5,7 @@ import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
+import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.math.Rectangle;
@@ -25,7 +26,7 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MyGdxGame extends ApplicationAdapter implements InputProcessor {
+public class GameScreen implements Screen {
 	private static final int FRAME_COLS = 10, FRAME_ROWS = 8;
 	Rectangle link;
 	TextureRegion[] up,down,left,right,idle;
@@ -36,11 +37,12 @@ public class MyGdxGame extends ApplicationAdapter implements InputProcessor {
 	private float tiempoTranscurridoDesdeDisparo = 0;
 	int lastDirection = -1;
 	Texture proyectilTexture;
-	Animation<TextureRegion> walkAnimation, shootAnimation; // Must declare frame type (TextureRegion)
+	Animation<TextureRegion> walkAnimation; // Must declare frame type (TextureRegion)
 	Texture walkSheet,backgroundImage,muelte;
 	SpriteBatch spriteBatch;
 	Music menuMusic;
 	Sound sound;
+	final Drop game;
 	int gi = 0, px = 364, py = 364;
 	ArrayList<Bullet>proyectiles = new ArrayList<>();
 	int x,y,speed;
@@ -49,12 +51,9 @@ public class MyGdxGame extends ApplicationAdapter implements InputProcessor {
 	private Viewport viewport;
 	private int screenWidth = 900; // Ancho deseado de la pantalla
 	private int screenHeight = 600; // Alto deseado de la pantalla
-	@Override
-	public void resize(int width, int height) {
-		viewport.update(width, height); // Actualiza el viewport con el nuevo tamaño de la pantalla
-	}
-	@Override
-	public void create () {
+
+	public GameScreen(Drop game) {
+		this.game = game;
 		x = 200;
 		y = 200;
 		enemigos = new ArrayList<Enemigo>();
@@ -73,11 +72,37 @@ public class MyGdxGame extends ApplicationAdapter implements InputProcessor {
 	}
 
 	@Override
-	public void render () {
+	public void show() {
+
+	}
+
+	@Override
+	public void resize(int width, int height) {
+		viewport.update(width, height); // Actualiza el viewport con el nuevo tamaño de la pantalla
+	}
+
+	@Override
+	public void pause() {
+
+	}
+
+	@Override
+	public void resume() {
+
+	}
+
+	@Override
+	public void hide() {
+
+	}
+
+	@Override
+	public void render (float deltas) {
 		float delta = Gdx.graphics.getDeltaTime();
 		System.out.println(delta);
 		stateTime += Gdx.graphics.getDeltaTime();
 		generarEnemigos();
+		link.setPosition(x,y);
 		// Actualiza y dibuja los enemigos
 		for (Enemigo enemigo : enemigos) {
 			enemigo.update(delta);
@@ -102,6 +127,8 @@ public class MyGdxGame extends ApplicationAdapter implements InputProcessor {
 		spriteBatch.begin();
 		spriteBatch.draw(backgroundImage, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+		TextureRegion currentFrame = walkAnimation.getKeyFrame(stateTime, true);
+		spriteBatch.draw(currentFrame, x, y,50,50);
 		for (Bullet proyectil : proyectiles) {
 			proyectil.render(spriteBatch);
 		}
@@ -110,16 +137,11 @@ public class MyGdxGame extends ApplicationAdapter implements InputProcessor {
 			Vector2 direccion = new Vector2(x - enemigo.getPosicion().x, y- enemigo.getPosicion().y);
 			float velocidadX = direccion.x/5; // Ajusta la velocidad horizontal del enemigo según la dirección
 			float velocidadY = direccion.y/5; // Ajusta la velocidad vertical del enemigo según la dirección
-
 			enemigo.setVelocidad(new Vector2(velocidadX,velocidadY));
 			enemigo.render(spriteBatch);
 		}
-
-		TextureRegion currentFrame = walkAnimation.getKeyFrame(stateTime, true);
 		controles();
 		limites();
-
-		spriteBatch.draw(currentFrame, x, y,50,50);
 		spriteBatch.end();
 		for (Bullet bala : proyectiles) {
 			for (Enemigo enemigo : enemigos) {
@@ -129,6 +151,14 @@ public class MyGdxGame extends ApplicationAdapter implements InputProcessor {
 					enemigos.remove(enemigo);
 					break; // Rompe el bucle inter
 				}
+			}
+		}
+		for (Enemigo enemigo : enemigos) {
+			if (link.overlaps(enemigo.getBoundingBox())) {
+				// Colisión detectada: elimina la bala y el enemigo
+				game.setScreen(new GameOverScreen(game));
+				menuMusic.stop();
+				break; // Rompe el bucle inter
 			}
 		}
 	}
@@ -253,62 +283,13 @@ public class MyGdxGame extends ApplicationAdapter implements InputProcessor {
 		backgroundImage = new Texture(Gdx.files.internal("background.png"));
 		walkSheet = new Texture("linkSheet.png");
 	}
-	@Override
-	public boolean touchDragged(int screenX, int screenY, int pointer) {
-		float diffX = screenX - initialTouchX;
-		float diffY = screenY - initialTouchY;
-
-		if (diffX >= 0) direction = 0;
-		else direction = 1;
-		px += diffX/40;
-		py -= diffY/100;
-		gi++;
-
-		return true;
-	}
-
-	@Override
-	public boolean mouseMoved(int screenX, int screenY) {
-		return false;
-	}
-
-	@Override
-	public boolean scrolled(float amountX, float amountY) {
-		return false;
-	}
-
-	@Override
-	public boolean keyDown(int keycode) {
-		return false;
-	}
-
-	@Override
-	public boolean keyUp(int keycode) {
-		return false;
-	}
-
-	@Override
-	public boolean keyTyped(char character) {
-		return false;
-	}
-
-	@Override
-	public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-		initialTouchX = screenX;
-		initialTouchY = screenY;
-		return true;
-	}
-
-	@Override
-	public boolean touchUp(int screenX, int screenY, int pointer, int button) {
-		return false;
-	}
 
 	@Override
 	public void dispose () {
 		spriteBatch.dispose();
 		walkSheet.dispose();
-
+		backgroundImage.dispose();
+		menuMusic.dispose();
 	}
 
 }

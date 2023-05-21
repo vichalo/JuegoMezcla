@@ -1,18 +1,16 @@
 package com.mygdx.game;
 
-import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.utils.ScreenUtils;
 
-public class GameOverScreen implements Screen {
-
+public class MainMenuScreen implements Screen {
     final Drop game;
 
     OrthographicCamera camera;
 
-    public GameOverScreen(final Drop game) {
+    public MainMenuScreen(final Drop game) {
         this.game = game;
 
         camera = new OrthographicCamera();
@@ -32,8 +30,9 @@ public class GameOverScreen implements Screen {
         game.batch.setProjectionMatrix(camera.combined);
 
         game.batch.begin();
-        game.font.draw(game.batch, "GAME OVER, THANKS FOR PLAYING!", 270, 350);
+        game.font.draw(game.batch, "WELCOME TO MY GAME :D", 300, 350);
         game.font.draw(game.batch, "Tap anywhere to begin!", 300, 300);
+        game.font.draw(game.batch, "CONTROLS: UP,DOWN,RIGHT,LEFT TO MOVE AND SPACE TO SHOOT", 150, 250);
         game.batch.end();
 
         if (Gdx.input.isTouched()) {

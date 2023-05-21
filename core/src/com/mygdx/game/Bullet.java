@@ -39,18 +39,6 @@ public class Bullet {
         }
     }
 
-    public void detectarColision(List<Rectangle> objetosColisionables) {
-        Rectangle proyectilRect = new Rectangle(position.x, position.y, 20, 20);
-
-        for (Rectangle objeto : objetosColisionables) {
-            if (proyectilRect.overlaps(objeto)) {
-                // Se ha detectado una colisión con el objeto
-                // Aquí puedes realizar cualquier acción que desees, como eliminar el proyectil o reducir la salud del enemigo
-                markedForRemoval = true;
-                break; // Puedes salir del bucle si no quieres detectar más colisiones
-            }
-        }
-    }
     public void render(SpriteBatch batch) {
         batch.draw(texture, position.x, position.y);
     }
